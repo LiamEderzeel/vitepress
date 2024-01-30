@@ -9,7 +9,7 @@
 
 Fix attributes for internal `preWrapperPlugin`
 
-````md }
+````md
 ```md {data-attribute="some data" .yellow}
 ````
 
