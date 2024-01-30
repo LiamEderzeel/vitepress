@@ -30,7 +30,11 @@ const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz', 10)
  *    [{ line: number, classes: string[] }]
  */
 const attrsToLines = (attrs: string): TransformerCompactLineOption[] => {
-  attrs = attrs.replace(/^(?:\[.*?\])?.*?([\d,-]+).*/, '$1').trim()
+  console.log('attrsToLines: ' + attrs)
+  // attrs = attrs.replace(/^(?:\[.*?\])?.*?([\d,-]+).*/, '$1').trim()
+  attrs = attrs
+    .replace(/^.*?{.*?highlight-lines="([\d,-]+)".*?}.*/, '$1')
+    .trim()
   const result: number[] = []
   if (!attrs) {
     return []

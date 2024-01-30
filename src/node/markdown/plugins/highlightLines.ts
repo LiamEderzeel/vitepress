@@ -4,7 +4,8 @@
 
 import type MarkdownIt from 'markdown-it'
 
-const RE = /{([\d,-]+)}/
+const fallbackRE = /{([\d,-]+)}/
+const RE = /{.*highlight-lines="([\d,-]+)".*}/
 
 export const highlightLinePlugin = (md: MarkdownIt) => {
   const fence = md.renderer.rules.fence!
@@ -14,7 +15,9 @@ export const highlightLinePlugin = (md: MarkdownIt) => {
 
     // due to use of markdown-it-attrs, the {0} syntax would have been
     // converted to attrs on the token
-    const attr = token.attrs && token.attrs[0]
+
+    const attr =
+      token.attrs && token.attrs.find((x) => x[0] === 'highlight-lines')
 
     let lines = null
 
@@ -22,27 +25,35 @@ export const highlightLinePlugin = (md: MarkdownIt) => {
       // markdown-it-attrs maybe disabled
       const rawInfo = token.info
 
-      if (!rawInfo || !RE.test(rawInfo)) {
+      if (!rawInfo || (!RE.test(rawInfo) && !fallbackRE.test(rawInfo))) {
         return fence(...args)
       }
 
-      const langName = rawInfo.replace(RE, '').trim()
+      const langName = rawInfo.replace(fallbackRE, '').trim()
 
       // ensure the next plugin get the correct lang
       token.info = langName
 
-      lines = RE.exec(rawInfo)![1]
+      if (RE.test(rawInfo)) {
+        lines = RE.exec(rawInfo)![1]
+      } else {
+        lines = fallbackRE.exec(rawInfo)![1]
+      }
     }
 
     if (!lines) {
-      lines = attr![0]
+      lines = attr![1]
 
       if (!lines || !/[\d,-]+/.test(lines)) {
         return fence(...args)
       }
     }
 
-    token.info += ' ' + lines
+    if (fallbackRE.test(token.info)) {
+      token.info = token.info.replace(fallbackRE, lines)
+    } else {
+      token.info += ' {highlight-lines="' + lines + '"}'
+    }
     return fence(...args)
   }
 }

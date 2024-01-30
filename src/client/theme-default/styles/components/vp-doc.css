@@ -295,6 +295,10 @@
   margin-top: -8px;
 }
 
+.vp-doc div[class*='language-'].filename pre {
+  padding-top: 26px;
+}
+
 .vp-doc [class*='language-'] pre,
 .vp-doc [class*='language-'] code {
   /*rtl:ignore*/
@@ -408,6 +412,10 @@
   padding-left: 32px;
 }
 
+.vp-doc .filename .line-numbers-wrapper {
+  padding-top: 26px;
+}
+
 .vp-doc .line-numbers-wrapper {
   position: absolute;
   top: 0;
@@ -516,6 +524,25 @@
 .vp-doc [class*='language-'] > button.copy:focus + span.lang {
   opacity: 0;
 }
+
+/* .vp-doc [class*='language-'] > span.filename { */
+/*   position: absolute; */
+/*   top: 2px; */
+/*   /*rtl:ignore*/
+*/
+/*   left: 8px; */
+/*   z-index: 2; */
+/*   font-size: 12px; */
+/*   font-weight: 500; */
+/*   color: var(--vp-code-lang-color); */
+/*   transition: */
+/*     color 0.4s, */
+/*     opacity 0.4s; */
+/* } */
+
+/* .vp-doc [class*='language-'].line-numbers-mode > span.filename { */
+/*   left: 56px; */
+/* } */
 
 /**
  * Component: Team

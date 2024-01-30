@@ -41,7 +41,7 @@ For example, given the following directory structure:
 
 And providing you are in `foo/one.md`:
 
-```md
+```md [title]  
 [Home](/) <!-- sends the user to the root index.md -->
 [foo](/foo/) <!-- sends the user to index.html of directory foo -->
 [foo heading](./#heading) <!-- anchors user to a heading in the foo index file -->
@@ -65,12 +65,21 @@ Outbound links automatically get `target="_blank" rel="noreferrer"`:
 
 [YAML frontmatter](https://jekyllrb.com/docs/front-matter/) is supported out of the box:
 
-```yaml
+::: code-group
+```yaml {highlight-lines="1,3-4" line-numbers="100" file-name="controllers/test.yaml" tab-name="koa"} [controllers/test.yaml]
 ---
 title: Blogging Like a Hacker
 lang: en-US
 ---
 ```
+
+```yaml line-numbers="100" file-name="test.yaml" tab-name="express"
+---
+title: Blogging Like a Hacker
+lang: en-US
+---
+```
+:::
 
 This data will be available to the rest of the page, along with all custom and theming components.
 

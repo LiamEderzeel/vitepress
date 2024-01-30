@@ -103,7 +103,7 @@ function createCodeGroup(options: Options): ContainerArgs {
               isHtml
             ) {
               const title = extractTitle(
-                isHtml ? tokens[i].content : tokens[i].info,
+                isHtml ? tokens[i].content : tokens[i],
                 isHtml
               )
 
