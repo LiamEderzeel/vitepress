@@ -219,5 +219,8 @@
         "postcss"
       ]
     }
+  },
+  "stackblitz": {
+    "startCommand": "pnpm install && pnmp run docs:build && pnpm run docs:preview"
   }
 }
