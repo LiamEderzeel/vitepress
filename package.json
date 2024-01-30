@@ -221,6 +221,6 @@
     }
   },
   "stackblitz": {
-    "startCommand": "pnpm install && pnmp run docs:build && pnpm run docs:preview"
+    "startCommand": "pnpm install && pnpm run docs:build && pnpm run docs:preview"
   }
 }
