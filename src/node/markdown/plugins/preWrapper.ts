@@ -1,4 +1,5 @@
 import type MarkdownIt from 'markdown-it'
+import type Token from 'markdown-it/lib/token'
 
 export interface Options {
   hasSingleTheme: boolean
@@ -30,10 +31,12 @@ export function preWrapperPlugin(md: MarkdownIt, options: Options) {
       token.attrs = token.attrs ? token.attrs.concat(attrs) : attrs
     }
 
+    const fileName = extractFileName(token)
+    const annotation = fileName ? fileName : lang
     const rawCode = fence(...args)
     return `<div ${md.renderer.renderAttrs(
       token
-    )}><button title="Copy Code" class="copy"></button><span class="lang">${lang}</span>${rawCode}</div>`
+    )}><button title="Copy Code" class="copy"></button><span class="lang">${annotation}</span>${rawCode}</div>`
   }
 }
 
@@ -48,6 +51,18 @@ export function extractTitle(info: string, html = false) {
     )
   }
   return info.match(/\[(.*)\]/)?.[1] || extractLang(info) || 'txt'
+}
+
+function extractFileName(token: Token) {
+  return extractFileNameFromAttrs(token) || extractFileNameFromInfo(token)
+}
+
+function extractFileNameFromAttrs(token: Token) {
+  return (token.attrs && token.attrs.find((x) => x[0] === 'file-name'))?.[1]
+}
+
+function extractFileNameFromInfo(token: Token) {
+  return token.info.match(/{.*file-name="(.*)".*}/)?.[1]
 }
 
 function extractLang(info: string) {
