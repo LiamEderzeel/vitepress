@@ -2,6 +2,7 @@
 // It depends on preWrapper plugin.
 
 import type MarkdownIt from 'markdown-it'
+import type Token from 'markdown-it/lib/token'
 
 export const lineNumberPlugin = (md: MarkdownIt, enable = false) => {
   const fence = md.renderer.rules.fence!
@@ -9,20 +10,16 @@ export const lineNumberPlugin = (md: MarkdownIt, enable = false) => {
     const rawCode = fence(...args)
 
     const [tokens, idx] = args
-    const info = tokens[idx].info
+    const token = tokens[idx]
 
-    if (
-      (!enable && !/:line-numbers($| |=)/.test(info)) ||
-      (enable && /:no-line-numbers($| )/.test(info))
-    ) {
+    const lineNumbersValue = extractLineNumbers(token)
+    const noLineNumbersValue = extratNoNoLineNumber(token)
+
+    if ((!enable && !lineNumbersValue) || (enable && noLineNumbersValue)) {
       return rawCode
     }
 
-    let startLineNumber = 1
-    const matchStartLineNumber = info.match(/=(\d*)/)
-    if (matchStartLineNumber && matchStartLineNumber[1]) {
-      startLineNumber = parseInt(matchStartLineNumber[1])
-    }
+    const startLineNumber = lineNumbersValue || 1
 
     const code = rawCode.slice(
       rawCode.indexOf('<code>'),
@@ -46,4 +43,63 @@ export const lineNumberPlugin = (md: MarkdownIt, enable = false) => {
 
     return finalCode
   }
+}
+
+function extractLineNumbers(token: Token) {
+  return extractLineNumbersFromAttrs(token) || extractLineNumbersFromInfo(token)
+}
+
+function extractLineNumbersFromAttrs(token: Token) {
+  if (!token.attrs) return null
+  const attr = token.attrs.find((x) => x[0] === 'line-numbers')
+  if (!attr) return null
+
+  return attr[1] ? parseInt(attr[1]) : 1
+}
+
+function extractLineNumbersFromInfo(token: Token) {
+  const hasLineNumbers = token.info.match(
+    /(?:{.* |{)line-numbers(?:="(\d*)"|}| .*})/
+  )
+  if (!hasLineNumbers) return extractLineNumbersLagecyInfo(token)
+
+  return hasLineNumbers[1] ? parseInt(hasLineNumbers[1]) : 1
+}
+
+function extractLineNumbersLagecyInfo(token: Token) {
+  const hasLineNumbers = token.info.match(/:line-numbers(?:=(\d+)|)/)
+  if (!hasLineNumbers) return null
+
+  console.warn(
+    'the ":line-numbers" syntax is deprecated will be removed in 2.0.0 use the "line-numbers" attribute syntax instad'
+  )
+  return hasLineNumbers[1] ? parseInt(hasLineNumbers[1]) : 1
+}
+
+function extratNoNoLineNumber(token: Token) {
+  return (
+    extractNoLineNumbersFromAttrs(token) || extractNoLineNumbersFromInfo(token)
+  )
+}
+
+function extractNoLineNumbersFromAttrs(token: Token) {
+  if (!token.attrs) return null
+  return token.attrs.find((x) => x[0] === 'no-line-numbers') ? true : null
+}
+
+function extractNoLineNumbersFromInfo(token: Token) {
+  return (
+    /{.*no-line-numbers(?: .*}|})/.test(token.info) ||
+    extractNoLineNumbersLagecyFromInfo(token)
+  )
+}
+
+function extractNoLineNumbersLagecyFromInfo(token: Token) {
+  const hasNoLineNumbers = /:no-line-numbers($| )/.test(token.info)
+  if (hasNoLineNumbers) {
+    console.warn(
+      'the ":no-line-numbers" syntax is deprecated will be removed in 2.0.0 use the "line-numbers" attribute syntax instad'
+    )
+  }
+  return hasNoLineNumbers || null
 }
